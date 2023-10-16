@@ -1,3 +1,4 @@
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -8,12 +9,10 @@ from googleapiclient.discovery import build
 from PIL import Image
 
 # SETTING PAGE CONFIGURATIONS
-icon = Image.open("C:\Saved picture")
-st.set_page_config(page_title= "Youtube Data Harvesting and Warehousing | Malathi",
-                   page_icon= icon,
-                   layout= "wide",
-                   initial_sidebar_state= "expanded",
-                   menu_items={'About': """# This app is created by *Malathi*"""})
+
+st.title("Hello Streamlit")
+st.write("This is my youtube project!!!")
+
 
 # CREATING OPTION MENU
 with st.sidebar:
@@ -21,26 +20,64 @@ with st.sidebar:
                            icons=["house-door-fill","tools","card-text"],
                            default_index=0,
                            orientation="vertical",
-                           styles={"nav-link": {"font-size": "30px", "text-align": "centre", "margin": "0px", 
+                           styles={"nav-link": {"font-size": "20px", "text-align": "centre", "margin": "0px", 
                                                 "--hover-color": "#33A5FF"},
-                                   "icon": {"font-size": "30px"},
-                                   "container" : {"max-width": "6000px"},
+                                   "icon": {"font-size": "15px"},
+                                   "container" : {"max-width": "4000px"},
                                    "nav-link-selected": {"background-color": "#33A5FF"}})
 
 # Bridging a connection with MongoDB Atlas and Creating a new database(youtube_data)
-client = pymongo.MongoClient("localhost:27017")
-db = client.Youtube
+client = pymongo.MongoClient("mongodb+srv://malathikittusamy:malathi@cluster0.t4gj9p4.mongodb.net/?retryWrites=true&w=majority")
+db = client.dtt.Youtube
 # CONNECTING WITH MYSQL DATABASE
 mydb = sql.connect(host="127.0.0.1",
-                   user="root",
-                   password="",
-                   database= "youtube",
-                   port = "3306"
-                  )
+                       user="root",
+                       password="",
+                      )   
+print(mydb)
 mycursor = mydb.cursor(buffered=True)
 
+mycursor.execute("CREATE DATABASE if not exists youtube1")
+mycursor.execute("USE youtube1")
+
+mycursor.execute('''CREATE TABLE if not exists Channels(channel_name VARCHAR(255),
+                                            channel_id VARCHAR(255),
+                                            total_videos VARCHAR(255),
+                                            subscribers VARCHAR(255),
+                                            views VARCHAR(255),
+                                            joined_on DATETIME)''')
+mydb.commit()       
+
+mycursor.execute('''CREATE TABLE if not exists  Playlistdata(Playlistid VARCHAR(255),
+                                             channel_id VARCHAR(255),
+                                             Playlist_name TEXT,
+                                             Playlist_Description TEXT)''')
+                                            
+mydb.commit()       
+
+mycursor.execute('''CREATE TABLE if not exists Videodata  (channel_name VARCHAR(255),
+                                             channel_id VARCHAR(255),
+                                             video_id VARCHAR(255),
+                                             video_name VARCHAR(255),
+                                             video_description  TEXT,
+                                             duration TIME,
+                                             view_count INT,
+                                             like_count INT,
+                                             definition VARCHAR(255),
+                                             favorite_count INT,
+                                             comment_count INT,
+                                             publishedat DATETIME)''')
+mydb.commit()
+mycursor.execute('''CREATE TABLE if not exists Comment_data(video_id VARCHAR(255),
+                                             channel_id VARCHAR(255),
+                                             authorname VARCHAR(255),
+                                             publishedat DATETIME,
+                                             updated DATETIME,
+                                             Likes int)''')
+mydb.commit()      
+
 # BUILDING CONNECTION WITH YOUTUBE API
-api_key = "AIzaSyC8EnNot7isx5PGWLAEnrVZ12DXr3PwRcI"  
+api_key = "AIzaSyC8EnNot7isx5PGWLAEnrVZ12DXr3PwRcI"
 youtube = build('youtube','v3',developerKey=api_key)
 
 
@@ -156,12 +193,11 @@ def channel_names():
 # HOME PAGE
 if selected == "Home":
     # Title Image
-    icon = Image.open("C:\Saved picture")
-   # C:\Saved picture
+    #st.image("C:\\Users\\arunk\\OneDrive\\Desktop\\title.png")
     col1,col2 = st.columns(2,gap= 'medium')
-    col1.markdown("## :blue[Domain] : Social Media")
+    #col1.markdown("## :blue[Domain] : Social Media")
     col1.markdown("## :blue[Technologies used] : Python,MongoDB, Youtube Data API, MySql, Streamlit")
-    col1.markdown("## :blue[Overview] : Retrieving the Youtube channels data from the Google API, storing it in a MongoDB as data lake, migrating and transforming data into a SQL database,then querying the data and displaying it in the Streamlit app.")
+   # col1.markdown("## :blue[Overview] : Retrieving the Youtube channels data from the Google API, storing it in a MongoDB as data lake, migrating and transforming data into a SQL database,then querying the data and displaying it in the Streamlit app.")
     col2.markdown("#   ")
     col2.markdown("#   ")
     col2.markdown("#   ")
@@ -170,7 +206,7 @@ if selected == "Home":
     
 # EXTRACT AND TRANSFORM PAGE
 if selected == "Extract & Transform":
-    tab1,tab2 = st.tabs(["$\huge 📝 EXTRACT $", "$\huge🚀 TRANSFORM $"])
+    tab1,tab2 = st.tabs(["$\huge 📝 EXTRACT $", "$\huge TRANSFORM $"])
     
     # EXTRACT TAB
     with tab1:
